@@ -64,6 +64,7 @@ bigContainer.append(containerB);
 // containerB.append(textList);
 
 gameStart();
+advanced.sort();
 updateContainer(advanced, [], ['', '', '', '', ''], ['', '', '', '', ''], []);
 
 function updateContainer(wordList, known_letters, known_positions, excluded_positions, excluded_letters_2) {
@@ -335,7 +336,12 @@ function keyPress(event) {
 			}
 		}
 		if (event.key === 'Enter') {
-
+			if (event.shiftKey === true) {
+				gameOver();
+				gameStart();
+			} else {
+				
+			}
 			submitWord(wordRow);
 		}
 		if (event.key === ' ') {
