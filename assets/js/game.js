@@ -28,6 +28,7 @@ containerB.style.height = '400px';
 containerB.style.float = 'right';
 containerB.style.overflow = 'scroll';
 bigContainer.append(containerB);
+
 // document.body.append(containerB);
 
 // let textList = document.createElement('div');
@@ -88,6 +89,8 @@ function updateContainer(wordList, known_letters, known_positions, excluded_posi
 
 	let areLettersKnown = known_positions.join('').length > 0;
 
+	let wordCount = 0;
+
 	wordList.forEach(word => {
 
 		let isExcluded = false;
@@ -100,8 +103,8 @@ function updateContainer(wordList, known_letters, known_positions, excluded_posi
 		});
 
 		// #1, part 2 exclude words with excluded_letters_2
-		excluded_letters_2.forEach(el =>{
-			if(word.includes(el)){
+		excluded_letters_2.forEach(el => {
+			if (word.includes(el)) {
 				isExcluded = true;
 			}
 		})
@@ -129,6 +132,7 @@ function updateContainer(wordList, known_letters, known_positions, excluded_posi
 			let p = document.createElement('p');
 			p.textContent = word;
 			container.append(p);
+			wordCount++;
 		};
 
 	});
@@ -136,7 +140,9 @@ function updateContainer(wordList, known_letters, known_positions, excluded_posi
 	// 	let p = document.createElement('p');
 	// 	p.textContent = element;
 	// 	containerL.append(p);
-
+	try {
+		document.getElementById('notification').innerText = `Words = ${wordCount}`;
+	} catch (error) { }
 }
 
 function openModal(type, notification) {
@@ -320,6 +326,9 @@ function keyPress(event) {
 		let alphabet = 'abcdefghijklmnopqrstuvwxyz';
 		let wordRow = document.getElementsByClassName('row')[currentRow];
 		let rowBlockEl = wordRow.childNodes;
+
+		// TO DO
+		// what is this loop for? Would this be better served with toLowerCase().includes()?
 		for (i = 0; i < alphabet.length; i++) {
 			if ((event.key === alphabet[i] || event.key === alphabet[i].toUpperCase())) {
 				addLetter(rowBlockEl, alphabet[i]);
@@ -329,10 +338,38 @@ function keyPress(event) {
 
 			submitWord(wordRow);
 		}
+		if (event.key === ' ') {
+			console.log(rowBlockEl[nextRowBlock - 1]);
+			rowBlockCycle(rowBlockEl[nextRowBlock - 1]);
+		}
 		if (event.key === 'Backspace') {
 			deleteLetter(rowBlockEl);
 		}
 	}
+}
+
+function rowBlockCycle(path0) {
+	console.log("<>CYCLE CYCLE", path0);
+	switch (path0.className) {
+		case "row_block blockGrey":
+			path0.className = "row_block blockGold";
+			break;
+		case "row_block blockGold":
+			path0.className = "row_block blockGreen";
+			break;
+		default:
+			path0.className = "row_block blockGrey";
+			break;
+	}
+	
+}
+
+function rowBlockClick(event) {
+	console.log('<> rowBlockClick');
+	console.log(event);
+	console.log(event.path);
+	console.log(event.path[0].className);
+	rowBlockCycle(event.path[0]);
 }
 
 function enterClick() {
@@ -398,6 +435,9 @@ function deleteLetter(rowBlockEl) {
 	if (nextRowBlock > 0) {
 		nextRowBlock--;
 		rowBlockEl[nextRowBlock].innerText = '';
+		rowBlockEl[nextRowBlock].removeEventListener("click", rowBlockClick, false);
+		rowBlockEl[nextRowBlock].className = "row_block";
+
 	}
 }
 
@@ -409,71 +449,73 @@ function checkAnswer(wordRow, answer) {
 	let score = 0;
 
 	console.log(wordRow, answer);
-	let answerArray = [];
+	// let answerArray = [];
 
-	for (i = 0; i < answer.length; i++) {
-		let letter = answer[i].toUpperCase();
-		answerArray.push(letter);
-		let blockClass = 'blockGrey';
-		if (chosenWord.toUpperCase().includes(letter)) {
-			if (chosenWord[i].toUpperCase() === letter) {
-				score++;
-				blockClass = ' blockGreen';
-				if (count(answer, letter) > count(chosenWord, letter)) {
-					for (j = 0; j < wordRow.childNodes.length; j++) {
-						if (wordRow.childNodes[j].innerText == letter && wordRow.childNodes[j].className == 'row_block  blockGold') {
-							wordRow.childNodes[j].className = 'row_block  blockGrey';
-							let index = answerArray.indexOf(letter);
-							if (index !== -1) {
-								answerArray.splice(index, 1);
-							}
-						}
-					}
-				}
-			} else {
-				if (countOccurrences(answerArray, letter) <= count(chosenWord, letter)) {
-					blockClass = ' blockGold';
-				}
-				else {
-					blockClass = ' blockGrey';
-				}
-			}
-		}
-		wordRow.childNodes[i].className = 'row_block ' + blockClass;
-		let keyboard = document.getElementById('keyboard_' + letter);
-		if (chosenWord.toUpperCase().includes(letter)) {
-			if (letter == chosenWord[i]) {
-				if (!keyboard.className.includes('blockGreen')) {
-					keyboard.classList.remove('blockGold');
-					keyboard.className += ' blockGreen';
-				}
-			} else {
-				if (!keyboard.className.includes('blockGreen') && !keyboard.className.includes('blockGold')) {
-					keyboard.className += ' blockGold';
-				}
-			}
-		}
-		else {
-			if (!keyboard.className.includes('blockGrey')) {
-				keyboard.className += ' blockGrey';
-			}
-		}
-	}
+	// for (i = 0; i < answer.length; i++) {
+	// 	let letter = answer[i].toUpperCase();
+	// 	answerArray.push(letter);
+	// 	let blockClass = 'blockGrey';
+	// 	if (chosenWord.toUpperCase().includes(letter)) {
+	// 		if (chosenWord[i].toUpperCase() === letter) {
+	// 			score++;
+	// 			blockClass = ' blockGreen';
+	// 			if (count(answer, letter) > count(chosenWord, letter)) {
+	// 				for (j = 0; j < wordRow.childNodes.length; j++) {
+	// 					if (wordRow.childNodes[j].innerText == letter && wordRow.childNodes[j].className == 'row_block blockGold') {
+	// 						wordRow.childNodes[j].className = 'row_block blockGrey';
+	// 						let index = answerArray.indexOf(letter);
+	// 						if (index !== -1) {
+	// 							answerArray.splice(index, 1);
+	// 						}
+	// 					}
+	// 				}
+	// 			}
+	// 		} else {
+	// 			if (countOccurrences(answerArray, letter) <= count(chosenWord, letter)) {
+	// 				blockClass = ' blockGold';
+	// 			}
+	// 			else {
+	// 				blockClass = ' blockGrey';
+	// 			}
+	// 		}
+	// 	}
+	// 	wordRow.childNodes[i].className = 'row_block ' + blockClass;
+	// 	let keyboard = document.getElementById('keyboard_' + letter);
+	// 	if (chosenWord.toUpperCase().includes(letter)) {
+	// 		if (letter == chosenWord[i]) {
+	// 			if (!keyboard.className.includes('blockGreen')) {
+	// 				keyboard.classList.remove('blockGold');
+	// 				keyboard.className += ' blockGreen';
+	// 			}
+	// 		} else {
+	// 			if (!keyboard.className.includes('blockGreen') && !keyboard.className.includes('blockGold')) {
+	// 				keyboard.className += ' blockGold';
+	// 			}
+	// 		}
+	// 	}
+	// 	else {
+	// 		if (!keyboard.className.includes('blockGrey')) {
+	// 			keyboard.className += ' blockGrey';
+	// 		}
+	// 	}
+	// }
 
-	if (score === maxBlock) {
+	// if (score === maxBlock) {
 
 
-		let url = '<a href="https://duckduckgo.com/' + chosenWord + '+definition&ia=definition" target="_blank">' + chosenWord + '</a>';
+	// 	let url = '<a href="https://duckduckgo.com/' + chosenWord + '+definition&ia=definition" target="_blank">' + chosenWord + '</a>';
+	// 	let notification = url;
+	// 	gameOver();
+
+	// 	setTimeout(function () {
+	// 		openModal('endScore', notification);
+	// 	}, 250);
+	// }
+	if (currentRow == 5) {
+		let url = '<a href="https://duckduckgo.com/?q=%22' + answer + '%22+%22definition%22&ia=definition" target="_blank">' + answer + '</a>';
 		let notification = url;
-		gameOver();
+		filterWords(wordRow);
 
-		setTimeout(function () {
-			openModal('endScore', notification);
-		}, 250);
-	}
-	else if (currentRow == 5) {
-		let url = '<a href="https://duckduckgo.com/?q=%22' + chosenWord + '%22+%22definition%22&ia=definition" target="_blank">' + chosenWord + '</a>';
-		let notification = url;
 		gameOver();
 
 		setTimeout(function () {
@@ -486,7 +528,9 @@ function checkAnswer(wordRow, answer) {
 		currentRow++;
 	}
 }
+
 var z;
+
 function filterWords(wordRow) {
 	/* filterWords examines the current word, determines
 	 * the duplicate letters, the known letters and the
@@ -595,6 +639,8 @@ function addLetter(rowBlockEl, letter) {
 	}
 	if (nextRowBlock < maxBlock) {
 		rowBlockEl[nextRowBlock].innerText = letter.toUpperCase();
+		rowBlockEl[nextRowBlock].addEventListener("click", rowBlockClick);
+		rowBlockEl[nextRowBlock].className = "row_block blockGrey";
 		nextRowBlock++;
 	}
 }
