@@ -16,56 +16,32 @@ document.body.append(bigContainer);
 
 let containerA = document.createElement('div');
 containerA.id = 'containerA';
-containerA.style.width = '50%';
+containerA.style.width = '60%';
 containerA.style.float = 'left';
+console.log(containerA.style);
 bigContainer.append(containerA);
-// document.body.append(containerA);
 
 let containerB = document.createElement('div');
 containerB.id = 'containerB';
-containerB.style.width = '150px';
-containerB.style.height = '400px';
+containerB.style.width = '30%';
+containerB.style.height = '600px';
 containerB.style.float = 'right';
 containerB.style.overflow = 'scroll';
+containerB.style.borderLeft = '6px';
+containerB.style.borderLeftStyle = 'solid';
+containerB.style.paddingLeft = '1%';
+containerB.style.lineHeight = '1';  // https://medium.com/swlh/how-to-add-or-reduce-space-between-lines-of-text-using-just-html-and-css-bdd22708f971#:~:text=It%20turns%20out%20that's%20pretty,space%20between%20the%20lines%20changes.
+// containerA.style = '6px solid green;';
 bigContainer.append(containerB);
 
-// document.body.append(containerB);
 
-// let textList = document.createElement('div');
-// textList.className = 'textBoxy';
-// textList.style.height = '100%';
-// textList.id = 'noID';
-// textList.textContent = '';
-// textList.contentEditable = 'false';
+advanced.sort();
+fullList.sort();
+let theWordList = advanced;
 
-// https://github.com/AnsonLai/OctordleReformat/
-// https://stackoverflow.com/questions/5754712/add-characters-to-a-string-in-javascript
-// https://stackoverflow.com/questions/9980416/how-can-i-insert-new-line-carriage-returns-into-an-element-textcontent
-// https://coder-coder.com/display-divs-side-by-side/
-
-// textList.setAttribute('style', 'white-space: pre;');
-
-// let pre = ''
-
-// advanced.forEach(element => {
-// 	if (element[0] === 'A') {
-// 		let p = document.createElement('p');
-// 		p.textContent = element;
-// 		containerB.append(p);
-// 		// textList.textContent += pre + element;
-// 		// pre = '\n';
-// 	};
-// });
-
-// containerB.innerHTML = '';
-
-// textList.innerText = 'Nothing to see guessing!\nMore\nMore\nAgain\nAgain'
-
-// containerB.append(textList);
+updateContainer(theWordList, [], ['', '', '', '', ''], ['', '', '', '', ''], []);
 
 gameStart();
-advanced.sort();
-updateContainer(advanced, [], ['', '', '', '', ''], ['', '', '', '', ''], []);
 
 function updateContainer(wordList, known_letters, known_positions, excluded_positions, excluded_letters_2) {
 	// https://stackoverflow.com/questions/1960473/get-all-unique-values-in-a-javascript-array-remove-duplicates
@@ -205,7 +181,7 @@ function addLogo() {
 
 function setGlobal() {
 	console.log('> setGlobal()');
-	updateContainer(advanced, [], ['', '', '', '', ''], ['', '', '', '', ''], []);
+	updateContainer(theWordList, [], ['', '', '', '', ''], ['', '', '', '', ''], []);
 	gameFin = 0;
 	currentRow = 0;
 	nextRowBlock = 0;
@@ -235,9 +211,9 @@ function gameStart() {
 	setGlobal();
 	containerA.innerHTML = '';
 	// let wordType = (level == 'beginner') ? beginner : ((level == 'intermediate') ? intermediate : ((level == 'advanced') ? advanced : ((level == 'godmode') ? fullList : custom)));
-	let wordType = advanced;
+	let wordType = theWordList; //advanced;
 
-	console.log(advanced.length, wordType.length);
+	console.log(wordType.length, wordType.length);
 
 	let rand = Math.floor(Math.random() * wordType.length);
 	chosenWord = wordType[rand].toUpperCase();
@@ -613,7 +589,7 @@ function submitWord(wordRow) {
 
 		console.log(answer);
 
-		if (fullList.includes(answer)) {
+		if (theWordList.includes(answer)) {
 			checkAnswer(wordRow, answer);
 		} else {
 			remNotification = 0;
